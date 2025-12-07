@@ -7,32 +7,32 @@
  * @return {Object[]}
  */
 const transformStateWithClones = (state, actions) => {
-  const stateCopy = { ...state };
+  let stateCopy = { ...state };
   const states = [];
 
   for (const action of actions) {
     switch (action.type) {
       case 'addProperties': {
-        addProperties(stateCopy, action.extraData);
+        stateCopy = addProperties(stateCopy, action.extraData);
         break;
       }
 
       case 'removeProperties': {
-        removeProperties(stateCopy, action.keysToRemove);
+        stateCopy = removeProperties(stateCopy, action.keysToRemove);
         break;
       }
 
       case 'clear': {
-        clearState(stateCopy);
+        stateCopy = clearState(stateCopy);
         break;
       }
 
       default: {
-        break;
+        throw new Error(`Unknown action type: ${action.type}`);
       }
     }
 
-    states.push(structuredClone(stateCopy));
+    states.push(stateCopy);
   }
 
   return states;
@@ -42,30 +42,35 @@ const transformStateWithClones = (state, actions) => {
  * Add properties to state object
  * @param {Object} state Current state
  * @param {Object} data Data to add
+ * @returns {Object} New state object with added properties
  */
 function addProperties(state, data) {
-  Object.assign(state, data);
+  return { ...state, ...data };
 }
 
 /**
  * Remove properties from state object
  * @param {Object} state State object
  * @param {string[]} keys Keys to remove
+ * @returns {Object} New state object without specified properties
  */
 function removeProperties(state, keys) {
+  const newState = { ...state };
+
   for (const key of keys) {
-    delete state[key];
+    delete newState[key];
   }
+
+  return newState;
 }
 
 /**
  * Clear state object
  * @param {Object} state State object
+ * @returns {Object} Empty object
  */
 function clearState(state) {
-  for (const key in state) {
-    delete state[key];
-  }
+  return {};
 }
 
 module.exports = transformStateWithClones;
