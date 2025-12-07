@@ -32,7 +32,7 @@ const transformStateWithClones = (state, actions) => {
       }
     }
 
-    states.push(stateCopy);
+    states.push({ ...stateCopy });
   }
 
   return states;
